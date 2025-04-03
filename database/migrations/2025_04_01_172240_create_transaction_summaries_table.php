@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('transaction_summaries');
+        Schema::dropIfExists('inventory_movements'); // Ubah nama tabel di sini
     }
 };
