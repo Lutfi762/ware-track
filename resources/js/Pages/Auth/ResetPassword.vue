@@ -1,13 +1,12 @@
 <template>
-
     <Head>
-        <title>Login Account - Warehouse Tracking</title>
+        <title>Update Password - Warehouse Tracking</title>
     </Head>
     <div class="col-md-4">
         <div class="fade-in">
             <div class="text-center mb-4">
                 <a href="" class="text-dark text-decoration-none">
-                    <img src="/images/cash-machine.png" width="300">
+                    <img src="/images/cash-machine.png" width="70">
                     <h3 class="mt-2 font-weight-bold">WAREHOUSE TRACKING</h3>
                 </a>
             </div>
@@ -15,8 +14,7 @@
                 <div class="card border-top-purple border-0 shadow-sm rounded-3">
                     <div class="card-body">
                         <div class="text-start">
-                            <h5>LOGIN ACCOUNT</h5>
-                            <p class="text-muted">Sign In to your account</p>
+                            <h5>UPDATE PASSWORD</h5>
                         </div>
                         <hr>
                         <div v-if="session.status" class="alert alert-success mt-2">
@@ -45,12 +43,17 @@
                             <div v-if="errors.password" class="alert alert-danger">
                                 {{ errors.password }}
                             </div>
-                            <div class="row">
-                                <div class="col-12 mb-3 text-end">
-                                    <Link href="/forgot-password">Forgot Password?</Link>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="fa fa-lock"></i>
+                                    </span>
                                 </div>
+                                <input class="form-control" v-model="form.password_confirmation" :class="{ 'is-invalid': errors.password_confirmation }" type="password" placeholder="Password Confirmation">
+                            </div>
+                            <div class="row">
                                 <div class="col-12">
-                                    <button class="btn btn-primary shadow-sm rounded-sm px-4 w-100" type="submit">LOGIN</button>
+                                    <button class="btn btn-primary shadow-sm rounded-sm px-4 w-100" type="submit">UPDATE PASSWORD</button>
                                 </div>
                             </div>
                         </form>
@@ -68,7 +71,7 @@
     //import reactive
     import { reactive } from 'vue';
 
-    //import inertia adapter
+    //inertia adapter
     import { Inertia } from '@inertiajs/inertia';
 
     //import Heade and useForm from Inertia
@@ -90,28 +93,33 @@
 
         props: {
             errors: Object,
-            session: Object
+            route: Object,
+            session: Object,
         },
 
         //define composition API
-        setup() {
+        setup(props) {
 
             //define form state
             const form = reactive({
-                email: '',
+                email: props.route.query.email,
                 password: '',
+                password_confirmation: '',
+                token: props.route.params.token,
             });
 
             //submit method
             const submit = () => {
 
                 //send data to server
-                Inertia.post('/login', {
+                Inertia.post('/reset-password', {
 
                     //data
                     email: form.email,
                     password: form.password,
-                });
+                    password_confirmation: form.password_confirmation,
+                    token: form.token,
+                })
             }
 
             //return form state and submit method
