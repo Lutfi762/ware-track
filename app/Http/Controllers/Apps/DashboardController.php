@@ -4,14 +4,13 @@ namespace App\Http\Controllers\Apps;
 
 use Carbon\Carbon;
 use Inertia\Inertia;
-use App\Models\Profit;
 use App\Models\Product;
-use App\Models\Transaction;
+use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
-class DashboardController extends Controller
+class WarehouseController extends Controller
 {
     /**
      * Handle the incoming request.
@@ -21,70 +20,40 @@ class DashboardController extends Controller
      */
     public function __invoke(Request $request)
     {
-        //day
-        $day    = date('d');
+        // Get current date
+        $today = Carbon::now()->format('Y-m-d');
 
-        //week
-        $week = Carbon::now()->subDays(7);
-
-        //chart sales 7 days
-        $chart_sales_week = DB::table('transactions')
-            ->addSelect(DB::raw('DATE(created_at) as date, SUM(grand_total) as grand_total'))
-            ->where('created_at', '>=', $week)
+        // Get stock movements for the last 7 days
+        $stock_movements_week = DB::table('stock_movements')
+            ->addSelect(DB::raw('DATE(created_at) as date, SUM(quantity) as total_quantity'))
+            ->where('created_at', '>=', Carbon::now()->subDays(7))
             ->groupBy('date')
             ->get();
 
-        if(count($chart_sales_week)) {
-            foreach ($chart_sales_week as $result) {
-                $sales_date[]    = $result->date;
-                $grand_total[]   = (int)$result->grand_total;
+        if (count($stock_movements_week)) {
+            foreach ($stock_movements_week as $result) {
+                $movement_date[] = $result->date;
+                $total_quantity[] = (int)$result->total_quantity;
             }
-        }else {
-            $sales_date[]   = "";
-            $grand_total[]  = "";
+        } else {
+            $movement_date[] = "";
+            $total_quantity[] = "";
         }
-        
 
-        //count sales today
-        $count_sales_today = Transaction::whereDay('created_at', $day)->count();
+        // Count products with low stock (e.g., less than or equal to 10)
+        $low_stock_products = Product::where('stock', '<=', 10)->get();
 
-        //sum sales today
-        $sum_sales_today = Transaction::whereDay('created_at', $day)->sum('grand_total');
-
-        //sum profits today
-        $sum_profits_today = Profit::whereDay('created_at', $day)->sum('total');
-
-        //get product limit stock
-        $products_limit_stock = Product::with('category')->where('stock', '<=', 10)->get();
-
-        //chart best selling product
-        $chart_best_products = DB::table('transaction_details')
-            ->addSelect(DB::raw('products.title as title, SUM(transaction_details.qty) as total'))
-            ->join('products', 'products.id', '=', 'transaction_details.product_id')
-            ->groupBy('transaction_details.product_id')
-            ->orderBy('total', 'DESC')
+        // Get the latest stock movements
+        $latest_stock_movements = StockMovement::with('product')
+            ->orderBy('created_at', 'DESC')
             ->limit(5)
             ->get();
 
-        if(count($chart_best_products)) {
-            foreach ($chart_best_products as $data) {
-                $product[] = $data->title;
-                $total[]   = (int)$data->total;
-            }
-        }else {
-            $product[]   = "";
-            $total[]  = "";
-        }
-
-        return Inertia::render('Apps/Dashboard/Index', [
-            'sales_date'           => $sales_date,
-            'grand_total'          => $grand_total,
-            'count_sales_today'    => (int) $count_sales_today,
-            'sum_sales_today'      => (int) $sum_sales_today,
-            'sum_profits_today'    => (int) $sum_profits_today,
-            'products_limit_stock' => $products_limit_stock,
-            'product'              => $product,
-            'total'                => $total
+        return Inertia::render('Apps/Warehouse/Index', [
+            'movement_date'          => $movement_date,
+            'total_quantity'         => $total_quantity,
+            'low_stock_products'     => $low_stock_products,
+            'latest_stock_movements' => $latest_stock_movements,
         ]);
     }
 }
