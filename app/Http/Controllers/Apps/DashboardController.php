@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
-class WarehouseController extends Controller
+class DashboardController extends Controller
 {
     /**
      * Handle the incoming request.
@@ -49,7 +49,7 @@ class WarehouseController extends Controller
             ->limit(5)
             ->get();
 
-        return Inertia::render('Apps/Warehouse/Index', [
+        return Inertia::render('Apps/Dashboard/Index', [
             'movement_date'          => $movement_date,
             'total_quantity'         => $total_quantity,
             'low_stock_products'     => $low_stock_products,
