@@ -1,29 +1,84 @@
 <template>
     <Head>
-        <title>Dashboard - Aplikasi Kasir</title>
+        <title>Dashboard - Warehouse Tracking</title>
     </Head>
 
     <main class="c-main">
-        <div class="container-fluid">
-            <div class="fade-in">
+    <div class="container-fluid">
+        <div class="fade-in">
+            <div class="row">
+                <div class="col-md-8">
+                    <!-- Sales Chart for the Last 7 Days -->
+                    <div v-if="hasAnyPermission(['dashboard.stock_movements'])" class="card border-0 rounded-3 shadow border-top-purple mb-4">
+                        <div class="card-header">
+                            <span class="font-weight-bold"><i class="fa fa-chart-bar"></i> STOCK MOVEMENTS CHART LAST 7 DAYS</span>
+                        </div>
+                        <div class="card-body">
+                            <!-- Chart component or code will go here -->
+                        </div>
+                    </div>
+                </div>
 
-                <div class="row">
-                    <div class="col-md-8">
-                        <!-- Stock Movements for the Last 7 Days -->
-                        <div v-if="hasAnyPermission(['dashboard.stock_movements'])" class="card border-0 rounded-3 shadow border-top-purple">
-                            <div class="card-header">
-                                <span class="font-weight-bold"><i class="fa fa-history"></i> STOCK MOVEMENTS LAST 7 DAYS</span>
-                            </div>
-                            <div class="card-body">
-                                <ul>
-                                    <li v-for="(date, index) in movement_date" :key="index">
-                                        {{ date }}: {{ total_quantity[index] }} (In: {{ total_in[index] }}, Out: {{ total_out[index] }})
-                                    </li>
-                                </ul>
+                <div class="col-md-8">
+                    <!-- Stock Movements for the Last 7 Days -->
+                    <div v-if="hasAnyPermission(['dashboard.stock_movements'])" class="card border-0 rounded-3 shadow border-top-purple mb-4">
+                        <div class="card-header">
+                            <span class="font-weight-bold"><i class="fa fa-history"></i> STOCK MOVEMENTS TODAY</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="cart">
+                                <div class="cart-header">
+                                    <div class="cart-item">
+                                        <span>Date</span>
+                                        <span>Total Quantity</span>
+                                        <span>In</span>
+                                        <span>Out</span>
+                                    </div>
+                                </div>
+                                <div class="cart-body">
+                                    <div class="cart-item" v-for="(date, index) in movement_date" :key="index">
+                                        <span>{{ date }}</span>
+                                        <span>{{ total_quantity[index] }}</span>
+                                        <span>{{ total_in[index] }}</span>
+                                        <span>{{ total_out[index] }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                </div>
+
+                <div class="col-md-8">
+                    <!-- Stock Movements for Today -->
+                    <div v-if="hasAnyPermission(['dashboard.stock_movements_today'])" class="card border-0 rounded-3 shadow border-top-purple mb-4">
+                        <div class="card-header">
+                            <span class="font-weight-bold"><i class="fa fa-history"></i> STOCK MOVEMENTS TODAY</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="cart">
+                                <div class="cart-header">
+                                    <div class="cart-item">
+                                        <span>Product</span>
+                                        <span>Quantity</span>
+                                        <span>Movement Type</span>
+                                        <span>Date</span>
+                                    </div>
+                                </div>
+                                <div class="cart-body">
+                                    <div class="cart-item" v-for="(movement, index) in today_stock_movements" :key="index">
+                                        <span>{{ movement.product.name }}</span>
+                                        <span>{{ movement.quantity }}</span>
+                                        <span>{{ movement.movement_type }}</span>
+                                        <span>{{ movement.created_at }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+
                         <!-- Low Stock Products -->
                         <div v-if="hasAnyPermission(['dashboard.low_stock_products'])" class="card border-0 rounded-3 shadow border-top-danger mb-4">
                             <div class="card-header">

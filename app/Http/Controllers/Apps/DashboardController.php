@@ -59,6 +59,12 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // Get stock movements for today
+        $today_stock_movements = StockMovement::with('product')
+            ->whereDate('created_at', $today)
+            ->orderBy('created_at', 'DESC')
+            ->get();
+
         // Filter data based on request
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
@@ -95,6 +101,7 @@ class DashboardController extends Controller
             'low_stock_products'     => $low_stock_products,
             'latest_stock_movements' => $latest_stock_movements,
             'activity_log'          => $activity_log,
+            'today_stock_movements'  => $today_stock_movements, // Tambahkan data hari ini
         ]);
     }
 }

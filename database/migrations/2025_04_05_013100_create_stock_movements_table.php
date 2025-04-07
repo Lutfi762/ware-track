@@ -16,9 +16,12 @@ class CreateStockMovementsTable extends Migration
         Schema::create('stock_movements', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->integer('quantity');
+            $table->unsignedInteger('quantity'); // Pastikan quantity tidak negatif
             $table->enum('movement_type', ['in', 'out']); // 'in' for stock added, 'out' for stock removed
             $table->timestamps();
+
+            // Menambahkan indeks pada created_at untuk meningkatkan performa query
+            $table->index('created_at');
         });
     }
 
