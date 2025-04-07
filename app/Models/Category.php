@@ -11,22 +11,21 @@ return new class extends Migration
      *
      * @return void
      */
-    
-     public function up()
-     {
-         Schema::create('transactions', function (Blueprint $table) {
-             $table->id();
-             $table->unsignedBigInteger('product_id'); // ID produk
-             $table->enum('transaction_type', ['in', 'out']); // Jenis transaksi (in/out)
-             $table->integer('quantity'); // Jumlah barang yang masuk atau keluar
-             $table->timestamp('transaction_date'); // Tanggal dan waktu transaksi
-             $table->text('description')->nullable(); // Deskripsi tambahan (opsional)
-             $table->timestamps(); // Tanggal dan waktu dibuat dan diperbarui
- 
-             // Menambahkan foreign key constraint
-             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-         });
-     }
+    public function up()
+    {
+        Schema::create('transactions', function (Blueprint $table) {
+            $table->id(); // Primary key
+            $table->unsignedBigInteger('product_id'); // Foreign key for products
+            $table->enum('transaction_type', ['in', 'out']); // Transaction type (in/out)
+            $table->integer('quantity'); // Quantity of items
+            $table->timestamp('transaction_date'); // Date and time of transaction
+            $table->text('description')->nullable(); // Optional description
+            $table->timestamps(); // Created and updated timestamps
+
+            // Adding foreign key constraint
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+        });
+    }
 
     /**
      * Reverse the migrations.
@@ -35,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('transactions');
+        Schema::dropIfExists('transactions'); // Drop the transactions table
     }
 };

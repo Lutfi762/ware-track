@@ -16,18 +16,20 @@ class Product extends Model
      * @var array
      */
     protected $fillable = [
-        'image', 'barcode',  'description', 'supplier_id', 'category_id', 'stock,', 'name', 'sku', 
-     ];
-         /**
+        'image', 'barcode', 'description', 'supplier_id', 'category_id', 'stock', 'name', 'sku',
+    ];
+
+    /**
      * category
      *
-     * @return void
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
-     /**
+
+    /**
      * image
      *
      * @return Attribute
